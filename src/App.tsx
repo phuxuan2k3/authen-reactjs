@@ -6,7 +6,7 @@ import Register from "./pages/Register";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/authen-reactjs/">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signin" element={<SignIn />} />
