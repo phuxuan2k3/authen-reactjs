@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
+import LinkMUI from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
@@ -13,7 +13,7 @@ import { SitemarkIcon } from "../CustomIcons";
 import AppTheme from "./theme/AppTheme";
 import ColorModeSelect from "./theme/ColorModeSelect";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Alert,
   CircularProgress,
@@ -293,13 +293,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               <Typography sx={{ textAlign: "center" }}>
                 Already have an account?{" "}
                 <span>
-                  <Link
-                    href="signin"
-                    variant="body2"
-                    sx={{ alignSelf: "center" }}
-                  >
-                    Sign in
-                  </Link>
+                  <Link to="/signin">Sign in</Link>
                 </span>
               </Typography>
             </Box>

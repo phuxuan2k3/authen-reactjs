@@ -6,7 +6,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
+import LinkMUI from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
@@ -17,7 +17,7 @@ import { SitemarkIcon } from "../CustomIcons";
 import AppTheme from "./theme/AppTheme";
 import ColorModeSelect from "./theme/ColorModeSelect";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Alert,
   CircularProgress,
@@ -120,7 +120,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     console.log(data);
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND}/auth/login`,
+        `${import.meta.env.VITE_BACKEND}/auth/login/`,
         data
       );
       localStorage.setItem("token", response.data.access_token);
@@ -232,7 +232,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               <FormControl>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <FormLabel htmlFor="password">Password</FormLabel>
-                  <Link
+                  <LinkMUI
                     component="button"
                     type="button"
                     onClick={handleClickOpen}
@@ -240,7 +240,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                     sx={{ alignSelf: { xs: "center", sm: "baseline" } }}
                   >
                     Forgot your password?
-                  </Link>
+                  </LinkMUI>
                 </Box>
                 <TextField
                   error={passwordError}
@@ -278,13 +278,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               <Typography sx={{ textAlign: "center" }}>
                 Don&apos;t have an account?{" "}
                 <span>
-                  <Link
-                    href="/register"
-                    variant="body2"
-                    sx={{ alignSelf: "center" }}
-                  >
-                    Sign up
-                  </Link>
+                  <Link to="/register">Sign up</Link>
                 </span>
               </Typography>
             </Box>
