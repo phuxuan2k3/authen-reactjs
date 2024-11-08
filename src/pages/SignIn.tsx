@@ -12,23 +12,17 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
-import ForgotPassword from "../ForgotPassword";
-import { SitemarkIcon } from "../CustomIcons";
+import ForgotPassword from "../components/ForgotPassword";
+import { SitemarkIcon } from "../components/CustomIcons";
 import AppTheme from "./theme/AppTheme";
 import ColorModeSelect from "./theme/ColorModeSelect";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Alert,
-  CircularProgress,
-  Snackbar,
-  SnackbarCloseReason,
-  SnackbarOrigin,
-} from "@mui/material";
-
-interface State extends SnackbarOrigin {
-  open: boolean;
-}
+import Notification from "../components/Notification";
+import { Backdrop, CircularProgress, SnackbarCloseReason } from "@mui/material";
+import SnackbarState from "../interfaces/SnackbarState";
+import { useDispatch } from "react-redux";
+import { login } from "../store/authSlice";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -82,11 +76,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const [stateSnackbar, setStateSnackbar] = React.useState<State>({
-    open: false,
-    vertical: "bottom",
-    horizontal: "center",
-  });
+  const [openNotification, setOpenNotification] =
+    React.useState<boolean>(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -101,11 +92,12 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     reason?: SnackbarCloseReason
   ) => {
     if (reason === "clickaway") {
-      setStateSnackbar({ ...stateSnackbar, open: false });
+      setOpenNotification(false);
       return;
     }
   };
 
+  const dispatch = useDispatch();
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -117,18 +109,17 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     const email = formData.get("email");
     const password = formData.get("password");
     const data = { email, password };
-    console.log(data);
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND}/auth/login/`,
         data
       );
+      dispatch(login(response.data.access_token));
       localStorage.setItem("token", response.data.access_token);
-      console.log(response.data.access_token);
       setError("");
       navigate("/");
     } catch (err) {
-      setStateSnackbar({ ...stateSnackbar, open: true });
+      setOpenNotification(true);
       if (axios.isAxiosError(err) && err.response) {
         setError(err.response.data.message);
       } else {
@@ -166,24 +157,20 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     return isValid;
   };
 
+  const snackbarState: SnackbarState = {
+    open: openNotification,
+    vertical: "top",
+    horizontal: "center",
+    message: error,
+    severity: "error",
+  };
+
   return (
     <>
-      <Snackbar
-        open={stateSnackbar.open}
-        onClose={(event, reason) => handleCloseSnackbar(event, reason)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        key={stateSnackbar.vertical + stateSnackbar.horizontal}
-        sx={{ width: "30%" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error}
-        </Alert>
-      </Snackbar>
+      <Notification
+        state={snackbarState}
+        handleCloseSnackbar={handleCloseSnackbar}
+      />
       <AppTheme {...props}>
         <CssBaseline enableColorScheme />
         <SignInContainer direction="column" justifyContent="space-between">
@@ -262,11 +249,15 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 label="Remember me"
               />
               <ForgotPassword open={open} handleClose={handleClose} />
-              {isLoading && (
-                <Typography sx={{ textAlign: "center" }}>
-                  <CircularProgress size="30px" />
-                </Typography>
-              )}
+              <Backdrop
+                sx={(theme) => ({
+                  color: "#fff",
+                  zIndex: theme.zIndex.drawer + 1,
+                })}
+                open={isLoading}
+              >
+                <CircularProgress color="inherit" />
+              </Backdrop>
               <Button
                 type="submit"
                 fullWidth
